@@ -1,10 +1,10 @@
 import streamlit as st
 import numpy as np
 import pandas as pd
-from sklearn.svm import SVC
-from sklearn.metrics import classification_report
-from utils import columns
 import joblib
+
+columns = ['fixed acidity', 'volatile acidity', 'citric acid', 'residual sugar', 'chlorides',
+           'free sulfur dioxide', 'total sulfur dioxide', 'density', 'pH', 'sulphates', 'alcohol']
 
 # Function to preprocess input data
 def preprocess_data(fixed_acidity, volatile_acidity, citric_acid, residual_sugar, chlorides, free_sulfur_dioxide,
@@ -41,7 +41,7 @@ if st.button('Predict'):
 
     # Make prediction
     prediction = svm_model.predict(X_input)
-
+    print(prediction)
     # Display the prediction
     if prediction[0] == 1:
         st.success('Good quality wine.')
