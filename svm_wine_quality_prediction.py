@@ -8,6 +8,7 @@ import joblib
 # Load your dataset
 data = pd.read_csv("winequality-red.csv", delimiter=';')
 
+print(data.head())
 # Create a binary target variable: 1 if quality is >= 6, else 0
 data['winequality'] = [1 if x >= 6 else 0 for x in data['quality']]
 X = data.drop(['quality', 'winequality'], axis=1)
@@ -20,6 +21,9 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 scaler = StandardScaler()
 X_train_scaled = scaler.fit_transform(X_train)
 X_test_scaled = scaler.transform(X_test)
+
+# Save the scaler as scaler.joblib
+joblib.dump(scaler, 'scaler.joblib')
 
 # Create an SVM classifier
 svm_classifier = SVC()
@@ -42,3 +46,33 @@ print(classification_report(y_test, svm_predictions))
 
 # Save the trained model as svm_model.joblib
 joblib.dump(svm_classifier, 'svm_model.joblib')
+
+# Given input values
+fixed_acidity = 5.9
+volatile_acidity = 0.55
+citric_acid = 0.1
+residual_sugar = 2.2
+chlorides = 0.062
+free_sulfur_dioxide = 39.0
+total_sulfur_dioxide = 51.0
+density = 0.99512
+pH = 3.52
+sulphates = 0.76
+alcohol = 11.2
+#
+# Load the scaler from file
+scaler = joblib.load('scaler.joblib')
+
+# Scale the input features
+input_features = scaler.transform([[fixed_acidity, volatile_acidity, citric_acid, residual_sugar, chlorides,
+                                     free_sulfur_dioxide, total_sulfur_dioxide, density, pH, sulphates, alcohol]])
+
+# Make prediction
+prediction = svm_classifier.predict(input_features)
+print(input_features)
+print(prediction)
+# Display the prediction
+if prediction[0] == 1:
+    print('Predicted wine quality: Good')
+else:
+    print('Predicted wine quality: Bad')

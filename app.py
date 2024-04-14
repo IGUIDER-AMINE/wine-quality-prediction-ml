@@ -3,18 +3,8 @@ import numpy as np
 import pandas as pd
 import joblib
 
-columns = ['fixed acidity', 'volatile acidity', 'citric acid', 'residual sugar', 'chlorides',
-           'free sulfur dioxide', 'total sulfur dioxide', 'density', 'pH', 'sulphates', 'alcohol']
-
-# Function to preprocess input data
-def preprocess_data(fixed_acidity, volatile_acidity, citric_acid, residual_sugar, chlorides, free_sulfur_dioxide,
-                    total_sulfur_dioxide, density, pH, sulphates, alcohol):
-    row = np.array([fixed_acidity, volatile_acidity, citric_acid, residual_sugar, chlorides, free_sulfur_dioxide,
-                    total_sulfur_dioxide, density, pH, sulphates, alcohol])
-    X = pd.DataFrame([row], columns=columns)
-    return X
-
-# Load your trained SVM model
+# Load scaler and SVM model
+scaler = joblib.load('scaler.joblib')
 svm_model = joblib.load('svm_model.joblib')
 
 # Title of the Streamlit app
@@ -35,13 +25,12 @@ alcohol = st.number_input("Alcohol", min_value=0.0, max_value=100.0, step=0.1, v
 
 # Predict button
 if st.button('Predict'):
-    # Preprocess the input data
-    X_input = preprocess_data(fixed_acidity, volatile_acidity, citric_acid, residual_sugar, chlorides,
-                              free_sulfur_dioxide, total_sulfur_dioxide, density, pH, sulphates, alcohol)
-
+    # Scale the input features
+    input_features = scaler.transform([[fixed_acidity, volatile_acidity, citric_acid, residual_sugar, chlorides,
+                                         free_sulfur_dioxide, total_sulfur_dioxide, density, pH, sulphates, alcohol]])
     # Make prediction
-    prediction = svm_model.predict(X_input)
-    print(prediction)
+    prediction = svm_model.predict(input_features)
+
     # Display the prediction
     if prediction[0] == 1:
         st.success('Good quality wine.')
