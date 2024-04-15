@@ -1,7 +1,7 @@
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
-from sklearn.svm import SVC
+from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.metrics import classification_report
 import joblib
 
@@ -25,27 +25,27 @@ X_test_scaled = scaler.transform(X_test)
 # Save the scaler as scaler.joblib
 joblib.dump(scaler, 'scaler.joblib')
 
-# Create an SVM classifier
-svm_classifier = SVC()
+# Create a Gradient Boosting Classifier
+gb_classifier = GradientBoostingClassifier()
 
 # Train the classifier
-svm_classifier.fit(X_train_scaled, y_train)
+gb_classifier.fit(X_train_scaled, y_train)
 
 # Obtain the scores for both training and test sets
-train_score_svm_classifier = svm_classifier.score(X_train_scaled, y_train)
-test_score_svm_classifier = svm_classifier.score(X_test_scaled, y_test)
+train_score_gb_classifier = gb_classifier.score(X_train_scaled, y_train)
+test_score_gb_classifier = gb_classifier.score(X_test_scaled, y_test)
 
-print('Training Score:', train_score_svm_classifier)
-print('Test Score:', test_score_svm_classifier)
+print('Training Score:', train_score_gb_classifier)
+print('Test Score:', test_score_gb_classifier)
 
 # Make predictions
-svm_predictions = svm_classifier.predict(X_test_scaled)
+gb_predictions = gb_classifier.predict(X_test_scaled)
 
 # Classification report
-print(classification_report(y_test, svm_predictions))
+print(classification_report(y_test, gb_predictions))
 
-# Save the trained model as svm_model.joblib
-joblib.dump(svm_classifier, 'svm_model.joblib')
+# Save the trained model as gb_model.joblib
+joblib.dump(gb_classifier, 'gb_model.joblib')
 
 # Given input values
 fixed_acidity = 5.9
@@ -59,10 +59,10 @@ density = 0.99512
 pH = 3.52
 sulphates = 0.76
 alcohol = 11.2
-#
+
 # Load the scaler from file
 scaler = joblib.load('scaler.joblib')
-model = joblib.load('svm_model.joblib')
+model = joblib.load('gb_model.joblib')
 
 # Scale the input features
 input_features = scaler.transform([[fixed_acidity, volatile_acidity, citric_acid, residual_sugar, chlorides,
@@ -70,7 +70,6 @@ input_features = scaler.transform([[fixed_acidity, volatile_acidity, citric_acid
 
 # Make prediction
 prediction = model.predict(input_features)
-
 print(input_features)
 print(prediction)
 # Display the prediction
