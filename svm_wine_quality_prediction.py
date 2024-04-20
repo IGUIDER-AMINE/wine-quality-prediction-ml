@@ -6,7 +6,7 @@ from sklearn.metrics import classification_report
 import joblib
 
 # Load your dataset
-data = pd.read_csv("winequality-red.csv", delimiter=';')
+data = pd.read_csv("winequality.csv", delimiter=';')
 
 print(data.head())
 # Create a binary target variable: 1 if quality is >= 6, else 0
