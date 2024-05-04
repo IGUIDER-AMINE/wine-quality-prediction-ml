@@ -10,44 +10,28 @@ import joblib
 data = pd.read_csv("winequality.csv", delimiter=';')
 
 print(data.head())
-# =====
-# Select the specified columns
-selected_cols = ['alcohol', 'sulphates', 'citric acid', 'volatile acidity']
-data_selected = data[selected_cols]
 
-# Initialize a variable to store the indices of outliers
-outlier_indices = []
+# Define a function to remove outliers using the IQR method
+def remove_outliers_iqr(df, columns):
+    outlier_indices = set()  # Set to store indices of outliers
+    for col in columns:
+        q1 = df[col].quantile(0.25)
+        q3 = df[col].quantile(0.75)
+        iqr = q3 - q1
+        lower_bound = q1 - 1.5 * iqr
+        upper_bound = q3 + 1.5 * iqr
+        # Find indices of outliers and store them
+        outliers = df[(df[col] < lower_bound) | (df[col] > upper_bound)].index
+        outlier_indices.update(outliers)
+    # Drop rows containing outliers after the loop finishes
+    df_cleaned = df.drop(outlier_indices)
+    return df_cleaned
+print("Origenal data : ",len(data))
+# Remove outliers using the IQR method for selected columns
+columns_to_check = ['alcohol','sulphates','citric acid','volatile acidity']
+data = remove_outliers_iqr(data, columns_to_check)
+print("Data without outliers: ",len(data))
 
-# Loop through each selected column and identify outliers
-for col in selected_cols:
-    # Calculate mean and standard deviation for the current column
-    mean_col = data_selected[col].mean()
-    std_col = data_selected[col].std()
-
-    # Define a threshold (e.g., 3 times the standard deviation)
-    threshold = 3 * std_col
-
-    # Identify outliers for the current column and store their indices
-    col_outliers = data_selected[(data_selected[col] < mean_col - threshold) | (data_selected[col] > mean_col + threshold)].index
-    outlier_indices.extend(col_outliers)
-
-# Remove duplicate indices (if any)
-outlier_indices = list(set(outlier_indices))
-
-# Drop rows containing outliers
-data_no_outliers = data.drop(outlier_indices)
-
-# Calculate the number of rows removed
-num_rows_removed = len(outlier_indices)
-
-# Display the number of rows removed
-print("Number of rows removed:", num_rows_removed)
-
-# Print data_no_outliers and data with counts
-print("\nCount of data_no_outliers:", len(data_no_outliers))
-print("\nCount of original data:", len(data))
-data = data_no_outliers
-print("\ndata len:", len(data))
 # Create a binary target variable: 1 if quality is >= 6, else 0
 data['winequality'] = [1 if x >= 6 else 0 for x in data['quality']]
 X = data.loc[:,['alcohol','sulphates','citric acid','volatile acidity']]
