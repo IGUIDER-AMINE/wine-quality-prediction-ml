@@ -3,7 +3,7 @@ import joblib
 
 # Load scaler and SVM model
 scaler = joblib.load('scaler.joblib')
-svm_model = joblib.load('gb_model.joblib')
+svm_model = joblib.load('voting_model.joblib')
 
 # Title of the Streamlit app
 st.title('Predict Wine Quality')
